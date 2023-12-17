@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffeebase</title>
+</head>
+<body>
+    <h1>Coffee Bar Lehrer {{ user }} </h1>
+    <h2><div id="countdown">Ausloggen in <strong><span id="seconds">10</span></strong> Sekunden ...</div></h2>
+
+    <p>
+        Unbezahlte Kaffees: <strong>{{ counter_false }}</strong>
+    </p>
+    <p>
+        Kaffees insgesamt: <strong>{{ counter_all }}</strong>
+    </p>
+    <p>
+        <a href="{{ url_for('add_coffee', cof_user_id=user) }}">Kaffee ziehen</a>
+    </p>
+    <p>
+        <a href="{{ url_for('pay_coffee', cof_user_id=user) }}">Kaffee bezahlen: Offener Betrag: <strong>{{ '%.2f'|format(counter_false * 0.3) }} Euro</strong></a>
+    </p>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>cof_id</th>
+                <th>cof_user_id</th>
+                <th>cof_date</th>
+                <th>cof_payed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for coffee in coffees %}
+                <tr>
+                    <td>{{ coffee.cof_id }}</td>
+                    <td>{{ coffee.cof_user_id }}</td>
+                    <td>{{ coffee.cof_date.strftime('%d:%m:%Y %H:%M:%S ') }}</td>
+                    <td {% if coffee.cof_payed == true %} style="background-color:green"> {{ coffee.cof_payed }}
+                        {% else %} style="background-color:red"> {{ coffee.cof_payed }}
+                        {% endif %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+    <script>
+        // Funktion für den Countdown und die Weiterleitung
+        function countdownAndRedirect(seconds) {
+            // Hole das DOM-Element für den Countdown
+            var countdownElement = document.getElementById('seconds');
+
+            // Funktion für die Aktualisierung des Countdowns
+            function updateCountdown() {
+                countdownElement.textContent = seconds;
+                if (seconds === 0) {
+                    // Hier kannst du die gewünschte URL festlegen
+                    var targetUrl = '{{ url_for("login") }}'
+
+                    // Weiterleitung zur Ziel-URL
+                    window.location.href = targetUrl;
+                } else {
+                    seconds--;
+                    setTimeout(updateCountdown, 1000); // Aktualisiere den Countdown alle 1000 Millisekunden (1 Sekunde)
+                }
+            }
+
+            // Starte den Countdown
+            updateCountdown();
+        }
+
+        // Starte den Countdown mit einer Startzeit von 10 Sekunden
+        countdownAndRedirect(10);
+    </script>
+</body>
+</html>

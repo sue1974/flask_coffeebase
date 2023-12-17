@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textfeld Weiterleitung</title>
+</head>
+<body>
+    <h1>Coffee Bar</h1>
+    <form id="myForm">
+        <input type="text" id="inputField" onkeydown="checkEnter(event)">
+    </form>
+
+    <script>
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                var inputText = document.getElementById('inputField').value;
+                var targetUrl = '{{ url_for("index", cof_user_id="") }}' + encodeURIComponent(inputText);
+                window.location.href = targetUrl;
+                event.preventDefault();
+            }
+        }
+    </script>
+
+</body>
+</html>
