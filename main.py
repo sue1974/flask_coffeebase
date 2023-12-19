@@ -37,7 +37,7 @@ def login():
 @app.route('/index/<cof_user_id>')
 def index(cof_user_id):
     # coffees = Coffee.objects.delete()
-    coffees = Coffee.objects(cof_user_id=cof_user_id).order_by('-cof_date')
+    coffees = Coffee.objects(cof_user_id=cof_user_id).order_by('-cof_date').limit(50)
     counter_false = Coffee.objects(Q(cof_user_id=cof_user_id) & Q(cof_payed=False)).count()
     counter_all = Coffee.objects(cof_user_id=cof_user_id).count()
     return render_template('index.html', coffees=coffees, counter_false=counter_false, counter_all=counter_all,
