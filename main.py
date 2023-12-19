@@ -58,7 +58,7 @@ def add_coffee(cof_user_id):
 
 @app.route('/pay_coffee/<cof_user_id>')
 def pay_coffee(cof_user_id):
-    coffees = Coffee.objects(cof_user_id=cof_user_id)
+    coffees = Coffee.objects(Q(cof_user_id=cof_user_id) & Q(cof_payed=False))
 
     for coffee in coffees:
         coffee.cof_payed = True
