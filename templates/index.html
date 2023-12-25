@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +11,15 @@
     <style>
     body {
         font-family: 'Open Sans', sans-serif;
-        margin: 0 auto;
+        margin: 1.5em auto;
         max-width: 80em;
         display: grid;
    		gap: 0.5em;
         grid-template-columns: 1fr;
-        grid-template-rows: auto minmax(0, 600px);;
+        grid-template-rows: auto minmax(0, 600px);
         padding: 2em;
+        border-radius: 0em 1.5em 1.5em;
+	    border: 2px solid;
   }
 
     #buttons {
@@ -24,7 +27,6 @@
         grid-template-columns: 1fr 1fr;
         gap: 1em;
     }
-
 
     /* Style to make the link look like a button */
     .button-link {
@@ -40,9 +42,13 @@
       font-size: 1.5em;
     }
 
+    #table {
+        max-height: 100vh; /* Setzt die maximale Höhe auf 100% der Bildschirmhöhe */
+        overflow-y: auto; /* Fügt vertikale Scrollleisten hinzu, falls die Tabelle zu groß ist */
+    }
+
     table {
-      border-collapse: collapse;
-      width: 100%;
+        width: 100%;
     }
 
     th, td {
@@ -72,18 +78,33 @@
 	    border: thin solid;
     }
 
+    dialog {
+        padding: 3em;
+    	border-radius: 0em 1.5em 1.5em;
+	    border: 2px solid;
+    }
+
+    #closeButton {
+        padding: 1.5em;
+    }
   </style>
 </head>
+
 <body>
+
+    <dialog id="dialog">
+        <button id="closeButton" class="button-link" onclick="location.href='{{ url_for('pay_coffee', cof_user_id=user) }}'">Bezahlung von {{ '%.2f'|format(counter_false * 0.3) }}€ bestätigen</button>
+    </dialog>
+
     <header>
         <h1>Kaffee Station [ Lehrer {{ user }} ] </h1>
         <h3><div id="countdown">Ausloggen in <strong><span id="seconds">10</span></strong> Sekunden ...</div></h3>
 
         <section id="buttons">
-            <a href="{{ url_for('add_coffee', cof_user_id=user) }}" class="button-link">Kaffee ziehen für 0.30€</a>
-
-            <a href="{{ url_for('pay_coffee', cof_user_id=user) }}" class="button-link">Kaffee bezahlen: Offener Betrag: {{ '%.2f'|format(counter_false * 0.3) }}€ </a>
+            <button id="addCoffee" class="button-link" onclick="location.href='{{ url_for('add_coffee', cof_user_id=user) }}'">Kaffee ziehen für 0.30€</button>
+            <button id="payCoffee" class="button-link" onclick="openModal()">Kaffee bezahlen: Offener Betrag: {{ '%.2f'|format(counter_false * 0.3) }}€</button>
         </section>
+
         <p>
             <h3>Unbezahlte Kaffees: <strong>{{ counter_false }} </strong></h3>
         </p>
@@ -91,6 +112,7 @@
             <h3>Kaffees insgesamt: {{ counter_all }}</h3>
         </p>
     </header>
+
     <section id="table">
         <table border="1">
             <thead>
@@ -115,32 +137,41 @@
         </table>
     </section>
 </body>
+
 <script>
-        // Funktion für den Countdown und die Weiterleitung
-        function countdownAndRedirect(seconds) {
-            // Hole das DOM-Element für den Countdown
-            var countdownElement = document.getElementById('seconds');
+    var countdownActive = true; // Variable, um den Zustand des Countdowns zu verfolgen
 
-            // Funktion für die Aktualisierung des Countdowns
-            function updateCountdown() {
-                countdownElement.textContent = seconds;
-                if (seconds === 0) {
-                    // Hier kannst du die gewünschte URL festlegen
-                    var targetUrl = '{{ url_for("login") }}'
+    function openModal() {
+        dialog = document.getElementById("dialog");
+        dialog.showModal();
+        countdownActive = false; // Setze den Countdown auf inaktiv, wenn das Modal geöffnet wird
+    }
 
-                    // Weiterleitung zur Ziel-URL
-                    window.location.href = targetUrl;
-                } else {
+    // Funktion für den Countdown und die Weiterleitung
+    function countdownAndRedirect(seconds) {
+        var countdownElement = document.getElementById('seconds');
+
+        function updateCountdown() {
+            countdownElement.textContent = seconds;
+            if (seconds === 0) {
+                var targetUrl = '{{ url_for("login") }}'
+                window.location.href = targetUrl;
+            } else {
+                if (countdownActive) {
                     seconds--;
-                    setTimeout(updateCountdown, 1000); // Aktualisiere den Countdown alle 1000 Millisekunden (1 Sekunde)
+                    setTimeout(updateCountdown, 1000);
+                } else {
+                    // Der Countdown wurde gestoppt, führe keine weiteren Schritte aus
                 }
             }
-
-            // Starte den Countdown
-            updateCountdown();
         }
 
-        // Starte den Countdown mit einer Startzeit von 10 Sekunden
-        countdownAndRedirect(10);
+        // Starte den Countdown
+        updateCountdown();
+    }
+
+    // Starte den Countdown mit einer Startzeit von 10 Sekunden
+    countdownAndRedirect(10);
 </script>
+
 </html>
